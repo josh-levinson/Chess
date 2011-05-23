@@ -1,0 +1,11 @@
+This is a repository for my JavaScript enabled Chess game by Joshua Levinson (levinson420@yahoo.com).
+
+Will initially be created with JavaScript, jQuery, jQuery UI.  Human players/interface.
+
+Stages of development are:
+1. Setup basic board/pieces
+2. Work on piece attributes
+3. Determine legal maneuvers
+4. Setup capturing/scoring
+5. Setup end game conditions
+6. Work on Computer AI
