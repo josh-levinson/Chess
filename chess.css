@@ -4,8 +4,7 @@ body {
 
 div.row
 {
-	overflow: hidden;
-	position: relative;
+	clear: both;
 	height: auto;
 }
 
@@ -33,4 +32,14 @@ div.black
 div.white
 {
 	background-color: #ffffff;
+}
+
+div.piece-hover
+{
+	background-color: #ff6633;
+}
+
+div.piece-dropped
+{
+	background-color: #ccffff;
 }
