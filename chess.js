@@ -98,6 +98,19 @@ function InitBoard()
 	return chessBoard;
 }
 
+function isOccupied(row, column)
+{
+	var targetNode = $(".row" + row + ".col" + column + " > div.piece");
+	if (targetNode.length > 0)
+	{
+		if (targetNode.hasClass('black'))
+			return 'black';
+		else
+			return 'white';
+	}
+	return 'empty';
+}
+
 function DetermineLegalMoves(piece, location)
 {
 	var color = piece.color;
