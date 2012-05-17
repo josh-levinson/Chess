@@ -103,7 +103,7 @@ function isOccupied(row, column)
 	var targetNode = $(".row" + row + ".col" + column + " > div.piece");
 	if (targetNode.length > 0)
 	{
-		if (targetNode.hasClass('black'))
+		if (targetNode.hasClass('bl'))
 			return 'black';
 		else
 			return 'white';
@@ -118,15 +118,15 @@ function DetermineLegalMoves(piece, location)
 	var currentRow = location[0];
 	var currentCol = location[1];
 	
-	var legalMoves; // holds the return moves, a string of locations
+	var legalMoves = []; // holds the return moves, a string of locations
 	
 	switch (type)
 	{
 		case 'pawn':
 			if (color == 'black')
-				return currentRow + (currentCol - 1);
+				legalMoves.push([currentRow-1, currentCol])
 			else
-				return currentRow + (currentCol + 1);
+				legalMoves.push([currentRow+1, currentCol])
 			break;
 		case 'bishop':
 		
@@ -144,8 +144,8 @@ function DetermineLegalMoves(piece, location)
 		case 'king':
 			
 			break;
-		
 	}
+	return legalMoves;
 	
 	
 }
