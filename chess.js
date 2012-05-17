@@ -1,12 +1,11 @@
 // Created by Josh
+var newBoard = InitBoard();
+
 
 $(document).ready(function(){
-   
-   var newBoard = InitBoard();
 
-   
    $('.piece').draggable({
-	
+		snap:true
    });
    
    $('.space').droppable({
@@ -111,19 +110,45 @@ function isOccupied(row, column)
 	return 'empty';
 }
 
-function DetermineLegalMoves(piece, location)
+function convertModelToDom(spaces)
 {
-	var color = piece.color;
-	var type = piece.type;
-	var currentRow = location[0];
-	var currentCol = location[1];
+	/* takes array of spaces and returns string that represents
+	 * multiple selectors which can be used by jQuery
+	 */
+	var domSelectors = [];
 	
-	var legalMoves = []; // holds the return moves, a string of locations
+	for (i=0; i<spaces.length; i++)
+	{
+		domSelectors.push(".row" + spaces[i][0] + ".col" + spaces[i][1]);
+	}
+	return domSelectors.join(", ");
+}
+
+function convertDomToModel(selector)
+{
+	/* takes jQuery selector string, splits into
+	 * array of locations
+	 */
+	var locations = [];
+	var selectors = selector.split(' ');
+	for (i=0; i<selectors.length; i++)
+	{
+		var curSelector = [];
+		curSelector[0] = parseInt(selectors[i].substr(4,1));
+		curSelector[1] = parseInt(selectors[i].substr(9,1));
+		locations.push(curSelector);
+	}
+	return locations;	
+}
+
+function DetermineLegalMoves(pieceType, pieceColor, pieceRow, pieceCol)
+{
+	var legalMoves = []; // holds the return moves, a string of row, col pairs
 	
-	switch (type)
+	switch (pieceType)
 	{
 		case 'pawn':
-			if (color == 'black')
+			if (pieceColor == 'black')
 				legalMoves.push([currentRow-1, currentCol])
 			else
 				legalMoves.push([currentRow+1, currentCol])
