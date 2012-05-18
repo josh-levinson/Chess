@@ -1,11 +1,11 @@
 // Created by Josh
 var newBoard = InitBoard();
-
+var kingHasMoved = false; // need for castling
 
 $(document).ready(function(){
-
+   
    $('.piece').draggable({
-		snap:true
+
    });
    
    $('.space').droppable({
@@ -110,6 +110,14 @@ function isOccupied(row, column)
 	return 'empty';
 }
 
+function isOnBoard(row, column)
+{
+	if (row < 0 || row > 7 || column < 0 || column > 7)
+		return false;
+	else
+		return true;
+}
+
 function convertModelToDom(spaces)
 {
 	/* takes array of spaces and returns string that represents
@@ -141,11 +149,11 @@ function convertDomToModel(selector)
 	return locations;	
 }
 
-function DetermineLegalMoves(pieceType, pieceColor, pieceRow, pieceCol)
+function DetermineLegalMoves(piece, pieceRow, pieceCol)
 {
 	var legalMoves = []; // holds the return moves, a string of row, col pairs
 	
-	switch (pieceType)
+	switch (piece.type)
 	{
 		case 'pawn':
 			if (pieceColor == 'black')
@@ -170,7 +178,157 @@ function DetermineLegalMoves(pieceType, pieceColor, pieceRow, pieceCol)
 			
 			break;
 	}
+	return legalMoves;	
+}
+
+function AddStraightLineMoves(piece, pieceRow, pieceCol)
+{
+	var legalMoves = []; // holds return moves
+	
+	// start by going up in rows
+	for (i=pieceRow+1; i<8; i++)
+	{
+		var nextSpace = [i, pieceCol];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
+	// then down in rows
+	for (i=pieceRow-1; i>-1; i--)
+	{
+		var nextSpace = [i, pieceCol];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
+	// then up in columns
+	for (i=pieceCol+1; i<8; i++)
+	{
+		var nextSpace = [pieceRow, i];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
+	// finally down in columns
+	for (i=pieceCol-1; i>-1; i--)
+	{
+		var nextSpace = [pieceRow, i];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
 	return legalMoves;
+}
+
+function AddDiagonalMoves(piece, pieceRow, pieceCol)
+{
+	var legalMoves = [];
 	
+	// first determine moves going up both rows and cols
+	var j = pieceCol; // need to keep track of column as well
+	for (i=pieceRow+1; i<8; i++)
+	{
+		j++;
+		var nextSpace = [i, j];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
+	// next determine moves going up rows, down cols
+	j = pieceCol;
+	for (i=pieceRow+1; i<8; i++)
+	{
+		j--;
+		var nextSpace = [i, j];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
+	// next determine moves going down rows, up cols
+	j = pieceCol;
+	for (i=pieceRow-1; i>-1; i--)
+	{
+		j++;
+		var nextSpace = [i, j];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
+	// finally determine moves going down rows, down cols
+	j = pieceCol;
+	for (i=pieceRow-1; i<8; i--)
+	{
+		j--;
+		var nextSpace = [i, j];
+		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
+		if (spaceOccupied == "empty")
+			legalMoves.push(nextSpace);
+		else if (spaceOccupied != piece.color)
+		{
+			legalMoves.push(nextSpace);
+			break;
+		}
+		else
+			break;
+	}
+	return legalMoves;
+}
+
+function AddKnightMoves(piece, pieceRow, pieceCol)
+{
+	var legalMoves = [];
+	// have to manually check moves here unless I figure out a shortcut later
 	
+	var nextSpace = [pieceRow+2, piecerow+1];
+	if (isOnBoard(nextSpace[0], nextSpace[1]))
+		// do stuff here
 }
