@@ -5,13 +5,16 @@ var kingHasMoved = false; // need for castling
 $(document).ready(function(){
    
    $('.piece').draggable({
-
+		revert: 'invalid'
    });
    
    $('.space').droppable({
 			hoverClass: 'piece-hover',
 			drop: function(event, ui) {
 				$(this).addClass("piece-dropped");
+			},
+			accept: function(droppedPiece){
+				return isMoveLegal(droppedPiece, $(this));
 			}
    });
    
@@ -118,7 +121,9 @@ function isOnBoard(row, column)
 		return true;
 }
 
-function convertModelToDom(spaces)
+
+
+function convertSpaceModelToDom(spaces)
 {
 	/* takes array of spaces and returns string that represents
 	 * multiple selectors which can be used by jQuery
@@ -132,7 +137,7 @@ function convertModelToDom(spaces)
 	return domSelectors.join(", ");
 }
 
-function convertDomToModel(selector)
+function convertSpaceDomToModel(selector)
 {
 	/* takes jQuery selector string, splits into
 	 * array of locations
@@ -149,17 +154,41 @@ function convertDomToModel(selector)
 	return locations;	
 }
 
-function DetermineLegalMoves(piece, pieceRow, pieceCol)
+function isMoveLegal(movedDomPiece, targetSpaceDom)
+{
+		// get piece from location of dropped piece
+		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
+		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
+		
+		// this is copying newBoard[pieceCol] rather than newBoard[pieceRow, pieceCol]
+		var movedPiece = newBoard[pieceRow][pieceCol];
+		
+		var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
+		var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
+		
+		var targetSpace = [spaceRow, spaceCol];
+		var legalMoves = determineLegalMoves(movedPiece, pieceRow, pieceCol);
+		
+		for (i=0; i<legalMoves.length; i++)
+		{
+			if ((targetSpace[0] == legalMoves[i][0]) && (targetSpace[1] == legalMoves[i][1]))
+				return true;
+		}
+		
+		return false;
+}
+
+function determineLegalMoves(piece, pieceRow, pieceCol)
 {
 	var legalMoves = []; // holds the return moves, a string of row, col pairs
 	
 	switch (piece.type)
 	{
 		case 'pawn':
-			if (pieceColor == 'black')
-				legalMoves.push([currentRow-1, currentCol])
+			if (piece.color == 'black')
+				legalMoves.push([pieceRow-1, pieceCol])
 			else
-				legalMoves.push([currentRow+1, currentCol])
+				legalMoves.push([pieceRow+1, pieceCol])
 			break;
 		case 'bishop':
 		
@@ -181,7 +210,7 @@ function DetermineLegalMoves(piece, pieceRow, pieceCol)
 	return legalMoves;	
 }
 
-function AddStraightLineMoves(piece, pieceRow, pieceCol)
+function addStraightLineMoves(piece, pieceRow, pieceCol)
 {
 	var legalMoves = []; // holds return moves
 	
@@ -248,7 +277,7 @@ function AddStraightLineMoves(piece, pieceRow, pieceCol)
 	return legalMoves;
 }
 
-function AddDiagonalMoves(piece, pieceRow, pieceCol)
+function addDiagonalMoves(piece, pieceRow, pieceCol)
 {
 	var legalMoves = [];
 	
@@ -323,12 +352,34 @@ function AddDiagonalMoves(piece, pieceRow, pieceCol)
 	return legalMoves;
 }
 
-function AddKnightMoves(piece, pieceRow, pieceCol)
+function addKnightMoves(piece, pieceRow, pieceCol)
 {
 	var legalMoves = [];
 	// have to manually check moves here unless I figure out a shortcut later
 	
-	var nextSpace = [pieceRow+2, piecerow+1];
-	if (isOnBoard(nextSpace[0], nextSpace[1]))
-		// do stuff here
+	var nextSpace = [pieceRow+2, pieceCol+1];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	nextSpace = [pieceRow+2, pieceCol-1];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	nextSpace = [pieceRow-2, pieceCol+1];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	nextSpace = [pieceRow-2, pieceCol-1];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	nextSpace = [pieceRow+1, pieceCol+2];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	nextSpace = [pieceRow+1, pieceCol-2];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	nextSpace = [pieceRow-1, pieceCol+2];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	nextSpace = [pieceRow-1, pieceCol-2];
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
+		legalMoves.push(nextSpace);
+	return legalMoves;
 }
