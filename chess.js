@@ -11,9 +11,9 @@ $(document).ready(function(){
    $('.space').droppable({
 			hoverClass: 'piece-hover',
 			drop: function(event, ui) {
-				$(this).addClass("piece-dropped");
+				performMove(ui.draggable, $(this));
 			},
-			accept: function(droppedPiece){
+			accept: function(droppedPiece) {
 				return isMoveLegal(droppedPiece, $(this));
 			}
    });
@@ -154,8 +154,9 @@ function convertSpaceDomToModel(selector)
 	return locations;	
 }
 
-function isMoveLegal(movedDomPiece, targetSpaceDom)
+function performMove(movedDomPiece, targetSpaceDom)
 {
+		
 		// get piece from location of dropped piece
 		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
 		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
@@ -166,15 +167,38 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
 		var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
 		
+		newBoard[spaceRow][spaceCol] = movedPiece;
+		newBoard[pieceRow][pieceCol] = null;
+		
+		// first move the dom elements
+		// $(targetSpaceDom).append(movedDomPiece);
+		// $(movedDomPiece).parent().empty();
+}
+
+function isMoveLegal(movedDomPiece, targetSpaceDom)
+{
+		// get piece from location of dropped piece
+		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
+		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
+		
+		// this is copying newBoard[pieceCol] rather than newBoard[pieceRow, pieceCol]
+		var movedPiece = newBoard[pieceRow][pieceCol];
+		if (movedPiece == null)
+			return false;
+		
+		var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
+		var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
+		
 		var targetSpace = [spaceRow, spaceCol];
 		var legalMoves = determineLegalMoves(movedPiece, pieceRow, pieceCol);
 		
 		for (i=0; i<legalMoves.length; i++)
 		{
 			if ((targetSpace[0] == legalMoves[i][0]) && (targetSpace[1] == legalMoves[i][1]))
+			{
 				return true;
+			}
 		}
-		
 		return false;
 }
 
@@ -185,9 +209,9 @@ function determineLegalMoves(piece, pieceRow, pieceCol)
 	switch (piece.type)
 	{
 		case 'pawn':
-			if (piece.color == 'black')
+			if ((piece.color == 'black') && (isOccupied((pieceRow-1), pieceCol) == 'empty'))
 				legalMoves.push([pieceRow-1, pieceCol])
-			else
+			else if (isOccupied((pieceRow+1), pieceCol) == 'empty')
 				legalMoves.push([pieceRow+1, pieceCol])
 			break;
 		case 'bishop':
