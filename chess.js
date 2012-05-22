@@ -157,22 +157,30 @@ function convertSpaceDomToModel(selector)
 function performMove(movedDomPiece, targetSpaceDom)
 {
 		
+		// defensive coding to protecting against calls after dom has moved
+		if (typeof movedDomPiece == 'undefined')
+			return false;
+		
 		// get piece from location of dropped piece
 		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
 		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
-		
-		// this is copying newBoard[pieceCol] rather than newBoard[pieceRow, pieceCol]
 		var movedPiece = newBoard[pieceRow][pieceCol];
 		
 		var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
 		var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
 		
+		// actually moved piece in model
 		newBoard[spaceRow][spaceCol] = movedPiece;
 		newBoard[pieceRow][pieceCol] = null;
 		
-		// first move the dom elements
-		// $(targetSpaceDom).append(movedDomPiece);
-		// $(movedDomPiece).parent().empty();
+		// empty, replace dom element
+		$(targetSpaceDom).empty();
+		$(targetSpaceDom).append(movedDomPiece);
+		
+		// reset css set by droppable since they don't expect node to be moved
+		$(movedDomPiece).css('top', '0');
+		$(movedDomPiece).css('left', '0');
+		$(movedDomPiece).css('right', '0');
 }
 
 function isMoveLegal(movedDomPiece, targetSpaceDom)
@@ -209,10 +217,29 @@ function determineLegalMoves(piece, pieceRow, pieceCol)
 	switch (piece.type)
 	{
 		case 'pawn':
-			if ((piece.color == 'black') && (isOccupied((pieceRow-1), pieceCol) == 'empty'))
-				legalMoves.push([pieceRow-1, pieceCol])
-			else if (isOccupied((pieceRow+1), pieceCol) == 'empty')
-				legalMoves.push([pieceRow+1, pieceCol])
+		
+			if (piece.color == 'black')
+			{
+				// straight down one space
+				if (isOccupied((pieceRow-1), pieceCol) == 'empty')
+					legalMoves.push([pieceRow-1, pieceCol]);
+				// or capturing down diagonal spaces
+				if (isOccupied((pieceRow-1), pieceCol-1) == 'white')
+					legalMoves.push([pieceRow-1, pieceCol-1]);
+				if (isOccupied((pieceRow-1), pieceCol+1) == 'white')
+					legalMoves.push([pieceRow-1, pieceCol+1]);
+			}
+			else if (piece.color == 'white')
+			{
+				// straight down one space
+				if (isOccupied((pieceRow+1), pieceCol) == 'empty')
+					legalMoves.push([pieceRow+1, pieceCol]);
+				// or capturing down diagonal spaces
+				if (isOccupied((pieceRow+1), pieceCol-1) == 'black')
+					legalMoves.push([pieceRow+1, pieceCol-1]);
+				if (isOccupied((pieceRow+1), pieceCol+1) == 'black')
+					legalMoves.push([pieceRow+1, pieceCol+1]);
+			}
 			break;
 		case 'bishop':
 		
