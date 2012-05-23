@@ -1,17 +1,20 @@
 // Created by Josh
 var newBoard = InitBoard();
 var kingHasMoved = false; // need for castling
+var currentMove = 'white';
 
 $(document).ready(function(){
    
    $('.piece').draggable({
 		revert: 'invalid'
    });
+   $('.bl').draggable("disable");
    
    $('.space').droppable({
 			hoverClass: 'piece-hover',
 			drop: function(event, ui) {
 				performMove(ui.draggable, $(this));
+				switchTurn();
 			},
 			accept: function(droppedPiece) {
 				return isMoveLegal(droppedPiece, $(this));
@@ -152,6 +155,22 @@ function convertSpaceDomToModel(selector)
 		locations.push(curSelector);
 	}
 	return locations;	
+}
+
+function switchTurn()
+{
+	if (currentMove == "white")
+	{
+		currentMove = "black";
+		$('.wh').draggable("disable");
+		$('.bl').draggable("enable");
+	}
+	else
+	{
+		currentMove = "white";
+		$('.bl').draggable("disable");
+		$('.wh').draggable("enable");
+	}
 }
 
 function performMove(movedDomPiece, targetSpaceDom)
