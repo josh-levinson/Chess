@@ -236,45 +236,22 @@ function determineLegalMoves(piece, pieceRow, pieceCol)
 	switch (piece.type)
 	{
 		case 'pawn':
-		
-			if (piece.color == 'black')
-			{
-				// straight down one space
-				if (isOccupied((pieceRow-1), pieceCol) == 'empty')
-					legalMoves.push([pieceRow-1, pieceCol]);
-				// or capturing down diagonal spaces
-				if (isOccupied((pieceRow-1), pieceCol-1) == 'white')
-					legalMoves.push([pieceRow-1, pieceCol-1]);
-				if (isOccupied((pieceRow-1), pieceCol+1) == 'white')
-					legalMoves.push([pieceRow-1, pieceCol+1]);
-			}
-			else if (piece.color == 'white')
-			{
-				// straight down one space
-				if (isOccupied((pieceRow+1), pieceCol) == 'empty')
-					legalMoves.push([pieceRow+1, pieceCol]);
-				// or capturing down diagonal spaces
-				if (isOccupied((pieceRow+1), pieceCol-1) == 'black')
-					legalMoves.push([pieceRow+1, pieceCol-1]);
-				if (isOccupied((pieceRow+1), pieceCol+1) == 'black')
-					legalMoves.push([pieceRow+1, pieceCol+1]);
-			}
+			legalMoves = addPawnMoves(piece, pieceRow, pieceCol);			
 			break;
 		case 'bishop':
-		
+			legalMoves = addDiagonalMoves(piece, pieceRow, pieceCol);
 			break;
 		case 'knight':
-		
+			legalMoves = addKnightMoves(piece, pieceRow, pieceCol);
 			break;
 		case 'rook':
-		
-			break;
-			
+			legalMoves = addStraightLineMoves(piece, pieceRow, pieceCol);
+			break;			
 		case 'queen':
-		
+			legalMoves = addDiagonalMoves(piece, pieceRow, pieceCol).concat(addStraightLineMoves(piece, pieceRow, pieceCol));
 			break;
 		case 'king':
-			
+			legalMoves = addKingMoves(piece, pieceRow, pieceCol);
 			break;
 	}
 	return legalMoves;	
@@ -282,7 +259,7 @@ function determineLegalMoves(piece, pieceRow, pieceCol)
 
 function addStraightLineMoves(piece, pieceRow, pieceCol)
 {
-	var legalMoves = []; // holds return moves
+	var straightMoves = []; // holds return moves
 	
 	// start by going up in rows
 	for (i=pieceRow+1; i<8; i++)
@@ -290,10 +267,10 @@ function addStraightLineMoves(piece, pieceRow, pieceCol)
 		var nextSpace = [i, pieceCol];
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 			break;
 		}
 		else
@@ -305,10 +282,10 @@ function addStraightLineMoves(piece, pieceRow, pieceCol)
 		var nextSpace = [i, pieceCol];
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 			break;
 		}
 		else
@@ -320,10 +297,10 @@ function addStraightLineMoves(piece, pieceRow, pieceCol)
 		var nextSpace = [pieceRow, i];
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 			break;
 		}
 		else
@@ -335,121 +312,179 @@ function addStraightLineMoves(piece, pieceRow, pieceCol)
 		var nextSpace = [pieceRow, i];
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			straightMoves.push(nextSpace);
 			break;
 		}
 		else
 			break;
 	}
-	return legalMoves;
+	return straightMoves;
 }
 
 function addDiagonalMoves(piece, pieceRow, pieceCol)
 {
-	var legalMoves = [];
+	var diagonalMoves = [];
 	
 	// first determine moves going up both rows and cols
-	var j = pieceCol; // need to keep track of column as well
-	for (i=pieceRow+1; i<8; i++)
+	var j = pieceCol + 1; // need to keep track of column as well
+	for (i=pieceRow+1; (i < 8 && j < 8); i++)
 	{
-		j++;
 		var nextSpace = [i, j];
+		j++;
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 			break;
 		}
 		else
 			break;
 	}
 	// next determine moves going up rows, down cols
-	j = pieceCol;
-	for (i=pieceRow+1; i<8; i++)
+	j = pieceCol - 1;
+	for (i=pieceRow + 1; (i < 8 && j > -1); i++)
 	{
-		j--;
 		var nextSpace = [i, j];
+		j--;
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 			break;
 		}
 		else
 			break;
 	}
 	// next determine moves going down rows, up cols
-	j = pieceCol;
-	for (i=pieceRow-1; i>-1; i--)
+	j = pieceCol + 1;
+	for (i=pieceRow - 1; (i > -1 && j < 8); i--)
 	{
-		j++;
 		var nextSpace = [i, j];
+		j++;
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 			break;
 		}
 		else
 			break;
 	}
 	// finally determine moves going down rows, down cols
-	j = pieceCol;
-	for (i=pieceRow-1; i<8; i--)
+	j = pieceCol - 1;
+	for (i=pieceRow-1; (i > -1 && j > -1); i--)
 	{
-		j--;
 		var nextSpace = [i, j];
+		j--;
 		var spaceOccupied = isOccupied(nextSpace[0], nextSpace[1]);
 		if (spaceOccupied == "empty")
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 		else if (spaceOccupied != piece.color)
 		{
-			legalMoves.push(nextSpace);
+			diagonalMoves.push(nextSpace);
 			break;
 		}
 		else
 			break;
 	}
-	return legalMoves;
+	return diagonalMoves;
 }
 
 function addKnightMoves(piece, pieceRow, pieceCol)
 {
-	var legalMoves = [];
+	var knightMoves = [];
 	// have to manually check moves here unless I figure out a shortcut later
 	
 	var nextSpace = [pieceRow+2, pieceCol+1];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow+2, pieceCol-1];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow-2, pieceCol+1];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow-2, pieceCol-1];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow+1, pieceCol+2];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow+1, pieceCol-2];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow-1, pieceCol+2];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow-1, pieceCol-2];
-	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(piece, nextSpace[0], nextSpace[1] != piece.color)))
-		legalMoves.push(nextSpace);
-	return legalMoves;
+	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(nextSpace[0], nextSpace[1]) != piece.color))
+		knightMoves.push(nextSpace);
+	
+	return knightMoves;
+}
+
+function addPawnMoves(piece, pieceRow, pieceCol)
+{
+	pawnMoves = [];
+	
+	if (piece.color == 'black')
+	{
+		// straight down one space
+		if (isOccupied((pieceRow-1), pieceCol) == 'empty')
+		{
+			pawnMoves.push([pieceRow-1, pieceCol]);
+			
+			// if first space is empty, check if first move, if so, add two-space move
+			if ((pieceRow == 6) && (isOccupied((pieceRow-2), pieceCol) == 'empty'))
+				pawnMoves.push([pieceRow-2, pieceCol]);
+			
+		}
+		// or capturing down diagonal spaces
+		if (isOccupied((pieceRow-1), pieceCol-1) == 'white')
+			pawnMoves.push([pieceRow-1, pieceCol-1]);
+		if (isOccupied((pieceRow-1), pieceCol+1) == 'white')
+			pawnMoves.push([pieceRow-1, pieceCol+1]);
+	}
+	else if (piece.color == 'white')
+	{
+		// straight down one space
+		if (isOccupied((pieceRow+1), pieceCol) == 'empty')
+		{
+			pawnMoves.push([pieceRow+1, pieceCol]);
+			if ((pieceRow == 1) && (isOccupied((pieceRow+2), pieceCol) == 'empty'))
+				pawnMoves.push([pieceRow+2, pieceCol]);
+		}
+		// or capturing down diagonal spaces
+		if (isOccupied((pieceRow+1), pieceCol-1) == 'black')
+			pawnMoves.push([pieceRow+1, pieceCol-1]);
+		if (isOccupied((pieceRow+1), pieceCol+1) == 'black')
+			pawnMoves.push([pieceRow+1, pieceCol+1]);
+	}
+	return pawnMoves;
+}
+
+function addKingMoves(piece, pieceRow, pieceCol)
+{
+	kingMoves = [];
+	
+	// have to manually go through them as far as I know
+	for (i = -1; i < 2; i++)
+	{
+		for (j = -1; j < 2; j++)
+		{
+			if (isOnBoard(pieceRow + i, pieceCol + j) && isOccupied(pieceRow + i, pieceCol + j) != piece.color)
+				kingMoves.push([pieceRow + i, pieceCol + j]);
+		}
+	}
+	
+	return kingMoves;
 }
