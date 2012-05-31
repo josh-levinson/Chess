@@ -1,6 +1,12 @@
 // Created by Josh
 var newBoard = InitBoard();
-var kingHasMoved = false; // need for castling
+
+var whiteKingHasMoved = false; // need for castling
+var blackKingHasMoved = false; 
+
+var whiteKingPosition = [0, 4]; //shortcut to prevent searching entire board for king
+var blackKingPosition = [7, 4];
+
 var currentMove = 'white';
 
 $(document).ready(function(){
@@ -191,6 +197,24 @@ function performMove(movedDomPiece, targetSpaceDom)
 		// actually moved piece in model
 		newBoard[spaceRow][spaceCol] = movedPiece;
 		newBoard[pieceRow][pieceCol] = null;
+		
+		// need to keep track of king moves for check testing
+		if (movedPiece.type == 'king')
+		{
+			if (movedPiece.color == 'white')
+			{
+				// keep track for castling
+				if (whiteKingHasMoved == false)
+					whiteKingHasMoved = true;
+				whiteKingPosition = [spaceRow, spaceCol];
+			}
+			else
+			{
+				if (blackKingHasMoved == false)
+					blackKingHasMoved = true;
+				blackKingPosition = [spaceRow, spaceCol];
+			}
+		}
 		
 		// empty, replace dom element
 		$(targetSpaceDom).empty();
@@ -487,4 +511,36 @@ function addKingMoves(piece, pieceRow, pieceCol)
 	}
 	
 	return kingMoves;
+}
+
+function performCheckTest()
+{
+	var whiteKingChecked = false;
+	var blackKingChecked = false;
+	
+	for (i = 0; i < 8; i++)
+	{
+		for (j = 0; j < 8; j++)
+		{
+			if (typeof(newBoard[i][j]) == "Object")
+			var currentPiece = newBoard[i][j];
+			var currentPieceMoves = determineLegalMoves(currentPiece, i, j);
+			for (k = 0; k < currentPieceMoves.length; k++)
+			{
+				if ((whiteKingPosition[0] == currentPieceMoves[k][0]) && (whiteKingPosition[1] == currentPieceMoves[k][1]))
+					whiteKingChecked = true;
+				if ((blackKingPosition[0] == currentPieceMoves[k][0]) && (blackingPosition[1] == currentPieceMoves[k][1]))
+					blackKingChecked = true;
+			}
+		}
+	}
+	
+	if (whiteKingChecked && blackKingChecked)
+		return "both";
+	else if (whiteKingChecked)
+		return "white";
+	else if (blackKingChecked)
+		return "black";
+	else
+		return "none";
 }
