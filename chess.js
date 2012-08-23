@@ -1,5 +1,5 @@
 // Created by Josh
-var newBoard = InitBoard();
+var chessBoard = InitBoard();
 
 var whiteKingHasMoved = false; // need for castling
 var blackKingHasMoved = false; 
@@ -69,44 +69,44 @@ function InitBoard()
 		pawn[blackPawnName] = {type: 'pawn', color: 'black', value: 1};
 	}
 
-	var chessBoard = [];
+	var newBoard = [];
 	
-	// initiate multi-dimensional array for chessboard
+	// initiate multi-dimensional array for newBoard
 	for (i=0; i<8; i++)
 	{
-		chessBoard[i] = [];
+		newBoard[i] = [];
 	}
 	
 	for (i=1; i<9; i++)
 	{
 		var whitePawnName = 'white' + i;
 		var blackPawnName = 'black' + i;
-		chessBoard[1][i-1] = pawn[whitePawnName];
-		chessBoard[6][i-1] = pawn[blackPawnName];				
+		newBoard[1][i-1] = pawn[whitePawnName];
+		newBoard[6][i-1] = pawn[blackPawnName];				
 	}
 
-	chessBoard[0][0] = rook['white1'];
-	chessBoard[0][7] = rook['white2'];
-	chessBoard[7][0] = rook['black1'];
-	chessBoard[7][7] = rook['black2'];
+	newBoard[0][0] = rook['white1'];
+	newBoard[0][7] = rook['white2'];
+	newBoard[7][0] = rook['black1'];
+	newBoard[7][7] = rook['black2'];
 				
-	chessBoard[0][1] = knight['white1'];
-	chessBoard[0][6] = knight['white2'];
-	chessBoard[7][1] = knight['black1'];
-	chessBoard[7][6] = knight['black2'];
+	newBoard[0][1] = knight['white1'];
+	newBoard[0][6] = knight['white2'];
+	newBoard[7][1] = knight['black1'];
+	newBoard[7][6] = knight['black2'];
 				
-	chessBoard[0][2] = bishop['white1'];
-	chessBoard[0][5] = bishop['white2'];
-	chessBoard[7][2] = bishop['black1'];
-	chessBoard[7][5] = bishop['black2'];
+	newBoard[0][2] = bishop['white1'];
+	newBoard[0][5] = bishop['white2'];
+	newBoard[7][2] = bishop['black1'];
+	newBoard[7][5] = bishop['black2'];
 				
-	chessBoard[0][3] = queen['white'];
-	chessBoard[7][3] = queen['black'];
+	newBoard[0][3] = queen['white'];
+	newBoard[7][3] = queen['black'];
 				
-	chessBoard[0][4] = king['white'];
-	chessBoard[7][4] = king['black'];
+	newBoard[0][4] = king['white'];
+	newBoard[7][4] = king['black'];
 
-	return chessBoard;
+	return newBoard;
 }
 
 function isOccupied(row, column)
@@ -189,14 +189,14 @@ function performMove(movedDomPiece, targetSpaceDom)
 		// get piece from location of dropped piece
 		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
 		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
-		var movedPiece = newBoard[pieceRow][pieceCol];
+		var movedPiece = chessBoard[pieceRow][pieceCol];
 		
 		var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
 		var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
 		
 		// actually moved piece in model
-		newBoard[spaceRow][spaceCol] = movedPiece;
-		newBoard[pieceRow][pieceCol] = null;
+		chessBoard[spaceRow][spaceCol] = movedPiece;
+		chessBoard[pieceRow][pieceCol] = null;
 		
 		// need to keep track of king moves for check testing
 		if (movedPiece.type == 'king')
@@ -214,8 +214,7 @@ function performMove(movedDomPiece, targetSpaceDom)
 					blackKingHasMoved = true;
 				blackKingPosition = [spaceRow, spaceCol];
 			}
-		}
-		
+		}		
 		// empty, replace dom element
 		$(targetSpaceDom).empty();
 		$(targetSpaceDom).append(movedDomPiece);
@@ -232,8 +231,8 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
 		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
 		
-		// this is copying newBoard[pieceCol] rather than newBoard[pieceRow, pieceCol]
-		var movedPiece = newBoard[pieceRow][pieceCol];
+		// this is copying chessBoard[pieceCol] rather than chessBoard[pieceRow, pieceCol]
+		var movedPiece = chessBoard[pieceRow][pieceCol];
 		if (movedPiece == null)
 			return false;
 		
@@ -247,6 +246,7 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		{
 			if ((targetSpace[0] == legalMoves[i][0]) && (targetSpace[1] == legalMoves[i][1]))
 			{
+				// finally, test if putting yourself in check
 				return true;
 			}
 		}
@@ -257,26 +257,29 @@ function determineLegalMoves(piece, pieceRow, pieceCol)
 {
 	var legalMoves = []; // holds the return moves, a string of row, col pairs
 	
-	switch (piece.type)
+	if (piece != null)
 	{
-		case 'pawn':
-			legalMoves = addPawnMoves(piece, pieceRow, pieceCol);			
-			break;
-		case 'bishop':
-			legalMoves = addDiagonalMoves(piece, pieceRow, pieceCol);
-			break;
-		case 'knight':
-			legalMoves = addKnightMoves(piece, pieceRow, pieceCol);
-			break;
-		case 'rook':
-			legalMoves = addStraightLineMoves(piece, pieceRow, pieceCol);
-			break;			
-		case 'queen':
-			legalMoves = addDiagonalMoves(piece, pieceRow, pieceCol).concat(addStraightLineMoves(piece, pieceRow, pieceCol));
-			break;
-		case 'king':
-			legalMoves = addKingMoves(piece, pieceRow, pieceCol);
-			break;
+		switch (piece.type)
+		{
+			case 'pawn':
+				legalMoves = addPawnMoves(piece, pieceRow, pieceCol);			
+				break;
+			case 'bishop':
+				legalMoves = addDiagonalMoves(piece, pieceRow, pieceCol);
+				break;
+			case 'knight':
+				legalMoves = addKnightMoves(piece, pieceRow, pieceCol);
+				break;
+			case 'rook':
+				legalMoves = addStraightLineMoves(piece, pieceRow, pieceCol);
+				break;			
+			case 'queen':
+				legalMoves = addDiagonalMoves(piece, pieceRow, pieceCol).concat(addStraightLineMoves(piece, pieceRow, pieceCol));
+				break;
+			case 'king':
+				legalMoves = addKingMoves(piece, pieceRow, pieceCol);
+				break;
+		}
 	}
 	return legalMoves;	
 }
@@ -513,24 +516,26 @@ function addKingMoves(piece, pieceRow, pieceCol)
 	return kingMoves;
 }
 
-function performCheckTest()
+function performCheckTest(testBoard)
 {
 	var whiteKingChecked = false;
 	var blackKingChecked = false;
 	
-	for (i = 0; i < 8; i++)
+	for (x = 0; x < 8; x++)
 	{
-		for (j = 0; j < 8; j++)
+		for (y = 0; y < 8; y++)
 		{
-			if (typeof(newBoard[i][j]) == "Object")
-			var currentPiece = newBoard[i][j];
-			var currentPieceMoves = determineLegalMoves(currentPiece, i, j);
-			for (k = 0; k < currentPieceMoves.length; k++)
+			if (typeof(testBoard[x][y]) == "object")
 			{
-				if ((whiteKingPosition[0] == currentPieceMoves[k][0]) && (whiteKingPosition[1] == currentPieceMoves[k][1]))
-					whiteKingChecked = true;
-				if ((blackKingPosition[0] == currentPieceMoves[k][0]) && (blackingPosition[1] == currentPieceMoves[k][1]))
-					blackKingChecked = true;
+				var currentPiece = testBoard[x][y];
+				var currentPieceMoves = determineLegalMoves(currentPiece, x, y);
+				for (z = 0; z < currentPieceMoves.length; z++)
+				{
+					if (currentPiece.color == "black" && (whiteKingPosition[0] == currentPieceMoves[z][0]) && (whiteKingPosition[1] == currentPieceMoves[z][1]))
+						whiteKingChecked = true;
+					if (currentPiece.color == "white" && (blackKingPosition[0] == currentPieceMoves[z][0]) && (blackKingPosition[1] == currentPieceMoves[z][1]))
+						blackKingChecked = true;
+				}
 			}
 		}
 	}
