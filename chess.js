@@ -223,6 +223,8 @@ function performMove(movedDomPiece, targetSpaceDom)
 		$(movedDomPiece).css('top', '0');
 		$(movedDomPiece).css('left', '0');
 		$(movedDomPiece).css('right', '0');
+		
+		pieceMoved = true;
 }
 
 function isMoveLegal(movedDomPiece, targetSpaceDom)
@@ -230,6 +232,10 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		// get piece from location of dropped piece
 		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
 		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
+		
+		// for check testing
+	var futureWhiteKingPosition = whiteKingPosition;
+	var futureBlackKingPosition = blackKingPosition;
 		
 		// this is copying chessBoard[pieceCol] rather than chessBoard[pieceRow, pieceCol]
 		var movedPiece = chessBoard[pieceRow][pieceCol];
@@ -239,6 +245,15 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
 		var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
 		
+		if (movedPiece.type == 'king')
+		{
+			if (movedPiece.color == 'white')
+				futureWhiteKingPosition = [spaceRow, spaceCol];
+			else
+				futureBlackKingPosition = [spaceRow, spaceCol];
+		}
+		
+		
 		var targetSpace = [spaceRow, spaceCol];
 		var legalMoves = determineLegalMoves(movedPiece, pieceRow, pieceCol);
 		
@@ -246,7 +261,16 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		{
 			if ((targetSpace[0] == legalMoves[i][0]) && (targetSpace[1] == legalMoves[i][1]))
 			{
-				// finally, test if putting yourself in check
+				// finally, test if putting yourself in check, start by copying board for test case
+				var specBoard = cloneObject(chessBoard);
+				
+				// move the piece on this spec board
+				specBoard[spaceRow][spaceCol] = movedPiece;
+				specBoard[pieceRow][pieceCol] = null;
+				
+				var checkResult = performCheckTest(specBoard);
+				if (currentMove == checkResult || checkResult == "both")
+					return false;
 				return true;
 			}
 		}
@@ -531,9 +555,9 @@ function performCheckTest(testBoard)
 				var currentPieceMoves = determineLegalMoves(currentPiece, x, y);
 				for (z = 0; z < currentPieceMoves.length; z++)
 				{
-					if (currentPiece.color == "black" && (whiteKingPosition[0] == currentPieceMoves[z][0]) && (whiteKingPosition[1] == currentPieceMoves[z][1]))
+					if (currentPiece.color == "black" && (futureWhiteKingPosition[0] == currentPieceMoves[z][0]) && (futureWhiteKingPosition[1] == currentPieceMoves[z][1]))
 						whiteKingChecked = true;
-					if (currentPiece.color == "white" && (blackKingPosition[0] == currentPieceMoves[z][0]) && (blackKingPosition[1] == currentPieceMoves[z][1]))
+					if (currentPiece.color == "white" && (futureBlackKingPosition[0] == currentPieceMoves[z][0]) && (futureBlackKingPosition[1] == currentPieceMoves[z][1]))
 						blackKingChecked = true;
 				}
 			}
@@ -548,4 +572,19 @@ function performCheckTest(testBoard)
 		return "black";
 	else
 		return "none";
+}
+
+function cloneObject(obj) {
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = cloneObject(obj[attr]);
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy obj! Its type isn't supported.");
 }
