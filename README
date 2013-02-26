@@ -9,3 +9,9 @@ Stages of development are:
 4. Setup capturing/scoring
 5. Setup end game conditions
 6. Work on Computer AI
+
+Current progress:
+1. Game board is represented, both in model and UI
+2. Moves are generally legal
+3. Checkmate can be achieved
+4. Castling/Pawn Promotion have not yet been implemented
