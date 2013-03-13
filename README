@@ -14,4 +14,4 @@ Current progress:
 1. Game board is represented, both in model and UI
 2. Moves are generally legal
 3. Checkmate can be achieved
-4. Castling/Pawn Promotion have not yet been implemented
+4. Castling/Pawn Promotion have not yet been implemented (Castling should work, but doesn't, womp womp)
