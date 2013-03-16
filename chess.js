@@ -554,7 +554,7 @@ function addKingMoves(board, piece, pieceRow, pieceCol)
 function addKingCastleMoves(board, piece, pieceRow, pieceCol)
 {
 	castleMoves = [];
-	if (currentMove == "white")
+	if (currentMove == "white" && piece.color == "white")
 	{
 		if (!whiteKingHasMoved)
 		{
@@ -564,7 +564,7 @@ function addKingCastleMoves(board, piece, pieceRow, pieceCol)
 				castleMoves.push([0, 6]);
 		}
 	}
-	else
+	else if (piece.color == "black")
 	{
 		if (!blackKingHasMoved)
 		{
