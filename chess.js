@@ -7,6 +7,8 @@ var blackKingHasMoved = false;
 var whiteKingPosition = [0, 4]; //shortcut to prevent searching entire board for king
 var blackKingPosition = [7, 4];
 
+varKingIsCastling = false;
+
 // for check testing
 var futureWhiteKingPosition = whiteKingPosition;
 var futureBlackKingPosition = blackKingPosition;
@@ -210,18 +212,70 @@ function performMove(movedDomPiece, targetSpaceDom)
 		
 		// need to keep track of king moves for check testing
 		if (movedPiece.type == 'king')
-		{
+		{			
 			if (movedPiece.color == 'white')
 			{
 				// keep track for castling
 				if (whiteKingHasMoved == false)
+				{
+					var spaceDiff = pieceCol - spaceCol;
+					// check if castling
+					if (spaceDiff > 1)
+					{
+						// moving left, move rook right
+						chessBoard[0][2] = chessBoard[0][0];
+						chessBoard[0][0] = null;
+						$('.c1').append($('.a1 .piece'));
+						$('.a1').empty();
+						$('.c1 .piece').css('top', '0');
+						$('.c1 .piece').css('left', '0');
+						$('.c1 .piece').css('right', '0');
+					}
+					else if (spaceDiff < -1)
+					{
+						// moving right, move rook left
+						chessBoard[0][5] = chessBoard[0][7];
+						chessBoard[0][7] = null;
+						$('.f1').append($('.h1 .piece'));
+						$('.h1').empty();
+						$('.f1 .piece').css('top', '0');
+						$('.f1 .piece').css('left', '0');
+						$('.f1 .piece').css('right', '0');
+					}
 					whiteKingHasMoved = true;
+				}
 				whiteKingPosition = [spaceRow, spaceCol];
 			}
 			else
 			{
 				if (blackKingHasMoved == false)
+				{
+					var spaceDiff = pieceCol - spaceCol;
+					// check if castling
+					if (spaceDiff > 1)
+					{
+						// moving left, move rook right
+						chessBoard[7][2] = chessBoard[7][0];
+						chessBoard[7][0] = null;
+						$('.c8').append($('.a8 .piece'));
+						$('.a8').empty();
+						$('.c8 .piece').css('top', '0');
+						$('.c8 .piece').css('left', '0');
+						$('.c8 .piece').css('right', '0');
+					}
+					else if (spaceDiff < -1)
+					{
+						// moving right, move rook left
+						chessBoard[7][5] = chessBoard[7][7];
+						chessBoard[7][7] = null;
+						$('.f8').append($('.h8 .piece'));
+						$('.h8').empty();
+						$('.f8 .piece').css('top', '0');
+						$('.f8 .piece').css('left', '0');
+						$('.f8 .piece').css('right', '0');
+					}
 					blackKingHasMoved = true;
+				}
 				blackKingPosition = [spaceRow, spaceCol];
 			}
 		}		
