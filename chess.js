@@ -545,40 +545,33 @@ function addKnightMoves(board, piece, pieceRow, pieceCol)
 function addPawnMoves(board, piece, pieceRow, pieceCol)
 {
 	pawnMoves = [];
+	var dir; // direction
+	var fRow; //starting row
 	
 	if (piece.color == 'black')
 	{
-		// straight down one space
-		if (isOccupied(board, (pieceRow-1), pieceCol) == 'empty')
-		{
-			pawnMoves.push([pieceRow-1, pieceCol]);
-			
-			// if first space is empty, check if first move, if so, add two-space move
-			if ((pieceRow == 6) && (isOccupied(board, (pieceRow-2), pieceCol) == 'empty'))
-				pawnMoves.push([pieceRow-2, pieceCol]);
-			
-		}
-		// or capturing down diagonal spaces
-		if (isOccupied(board, (pieceRow-1), pieceCol-1) == 'white')
-			pawnMoves.push([pieceRow-1, pieceCol-1]);
-		if (isOccupied(board, (pieceRow-1), pieceCol+1) == 'white')
-			pawnMoves.push([pieceRow-1, pieceCol+1]);
+		dir = -1; // going down
+		fRow = 6;
 	}
-	else if (piece.color == 'white')
+	else
 	{
-		// straight down one space
-		if (isOccupied(board, (pieceRow+1), pieceCol) == 'empty')
-		{
-			pawnMoves.push([pieceRow+1, pieceCol]);
-			if ((pieceRow == 1) && (isOccupied(board, (pieceRow+2), pieceCol) == 'empty'))
-				pawnMoves.push([pieceRow+2, pieceCol]);
-		}
-		// or capturing down diagonal spaces
-		if (isOccupied(board, (pieceRow+1), pieceCol-1) == 'black')
-			pawnMoves.push([pieceRow+1, pieceCol-1]);
-		if (isOccupied(board, (pieceRow+1), pieceCol+1) == 'black')
-			pawnMoves.push([pieceRow+1, pieceCol+1]);
+		dir = 1; // up
+		fRow = 2;
 	}
+	if (isOccupied(board, (pieceRow + dir), pieceCol) == 'empty')
+	{
+		pawnMoves.push([pieceRow + dir, pieceCol]);
+		
+		// if first space is empty, check if first move, if so, add two-space move
+		if ((pieceRow == fRow) && (isOccupied(board, (pieceRow + (dir * 2)), pieceCol) == 'empty'))
+			pawnMoves.push([pieceRow + (dir * 2), pieceCol]);
+		
+	}
+	// or capturing down diagonal spaces
+	if (isOccupied(board, (pieceRow + dir), pieceCol - 1) != piece.color)
+		pawnMoves.push([pieceRow + dir, pieceCol - 1]);
+	if (isOccupied(board, (pieceRow + dir), pieceCol + 1) != piece.color)
+		pawnMoves.push([pieceRow + dir, pieceCol + 1]);
 	return pawnMoves;
 }
 
