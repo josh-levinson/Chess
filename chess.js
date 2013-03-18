@@ -354,7 +354,7 @@ function determineLegalMoves(board, piece, pieceRow, pieceCol)
 				legalMoves = addKnightMoves(board, piece, pieceRow, pieceCol);
 				break;
 			case 'rook':
-				legalMoves = addStraightLineMoves(board, piece, pieceRow, pieceCol).concat(addRookCastleMoves(board, piece, pieceRow, pieceCol));
+				legalMoves = addStraightLineMoves(board, piece, pieceRow, pieceCol);
 				break;			
 			case 'queen':
 				legalMoves = addDiagonalMoves(board, piece, pieceRow, pieceCol).concat(addStraightLineMoves(board, piece, pieceRow, pieceCol));
@@ -540,13 +540,6 @@ function addKnightMoves(board, piece, pieceRow, pieceCol)
 		knightMoves.push(nextSpace);
 	
 	return knightMoves;
-}
-
-function addRookCastleMoves(board, piece, pieceRow, pieceCol)
-{
-	castleMoves = [];
-	
-	return castleMoves;
 }
 
 function addPawnMoves(board, piece, pieceRow, pieceCol)
