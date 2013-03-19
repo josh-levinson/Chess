@@ -567,7 +567,7 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 			pawnMoves.push([pieceRow + (dir * 2), pieceCol]);
 		
 	}
-	// or capturing down diagonal spaces
+	// or capturing diagonal spaces
 	if (isOccupied(board, (pieceRow + dir), pieceCol - 1) != piece.color)
 		pawnMoves.push([pieceRow + dir, pieceCol - 1]);
 	if (isOccupied(board, (pieceRow + dir), pieceCol + 1) != piece.color)
@@ -594,25 +594,17 @@ function addKingMoves(board, piece, pieceRow, pieceCol)
 function addKingCastleMoves(board, piece, pieceRow, pieceCol)
 {
 	castleMoves = [];
-	if (currentMove == "white" && piece.color == "white")
-	{
-		if (!whiteKingHasMoved)
-		{
-			if ((isOccupied(chessBoard, 0, 1) == "empty") && (isOccupied(chessBoard, 0, 2) == "empty") && (isOccupied(chessBoard, 0, 3) == "empty"))
-				castleMoves.push([0, 1]);
-			if ((isOccupied(chessBoard, 0, 5) == "empty") && (isOccupied(chessBoard, 0, 6) == "empty"))
-				castleMoves.push([0, 6]);
-		}
-	}
-	else if (piece.color == "black")
-	{
-		if (!blackKingHasMoved)
-		{
-			if ((isOccupied(chessBoard, 7, 1) == "empty") && (isOccupied(chessBoard, 7, 2) == "empty") && (isOccupied(chessBoard, 7, 3) == "empty"))
-				castleMoves.push([7, 1]);
-			if ((isOccupied(chessBoard, 7, 5) == "empty") && (isOccupied(chessBoard, 7, 6) == "empty"))
-				castleMoves.push([7, 6]);
-		}
+	var kingRow;
+	if (piece.color == "white" && (!whiteKingHasMoved))
+		kingRow = 0;
+	else if (piece.color == "black" && (!blackKingHasMoved))
+		kingRow = 7;
+	if (kingRow != null)
+	{	
+		if ((isOccupied(chessBoard, kingRow, 1) == "empty") && (isOccupied(chessBoard, kingRow, 2) == "empty") && (isOccupied(chessBoard, kingRow, 3) == "empty"))
+			castleMoves.push([kingRow, 1]);
+		if ((isOccupied(chessBoard, kingRow, 5) == "empty") && (isOccupied(chessBoard, kingRow, 6) == "empty"))
+			castleMoves.push([kingRow, 6]);
 	}
 	return castleMoves;
 }
