@@ -11,7 +11,17 @@
     </head>
     <body>
         <h1>Chess v0.7</h1>
-        <div class="board">
+        <div class="pawnSelect" style="display: none; margin-bottom: 5px;">
+		Please select your promotion:&nbsp;
+		<select>
+			<option>Queen</option>
+			<option>Rook</option>
+			<option>Knight</option>
+			<option>Bishop</option>
+		</select>
+		<button class="pawnConfirm">Confirm</button>
+	</div>
+	<div class="board">
 			<div class="row">
 				<div class="a8 white space row7 col0">
 					<div class="piece bl rook">BR</div>		

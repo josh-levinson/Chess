@@ -33,6 +33,7 @@ $(document).ready(function(){
 			}
    });
    
+   
 });
    
 
@@ -165,6 +166,14 @@ function convertSpaceDomToModel(selector)
 	return locations;	
 }
 
+function getOppositeColor(color)
+{
+	if (color == "white")
+		return "black";
+	else
+		return "white";
+}
+
 function switchTurn()
 {
 	var lastMove = currentMove;
@@ -194,101 +203,150 @@ function switchTurn()
 function performMove(movedDomPiece, targetSpaceDom)
 {
 		
-		// defensive coding to protecting against calls after dom has moved
-		if (typeof movedDomPiece == 'undefined')
-			return false;
+	// defensive coding to protecting against calls after dom has moved
+	if (typeof movedDomPiece == 'undefined')
+		return false;
 		
-		// get piece from location of dropped piece
-		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
-		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
-		var movedPiece = chessBoard[pieceRow][pieceCol];
+	// get piece from location of dropped piece
+	var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
+	var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
+	var movedPiece = chessBoard[pieceRow][pieceCol];
+	
+	var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
+	var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
 		
-		var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
-		var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
+	// actually moved piece in model
+	chessBoard[spaceRow][spaceCol] = movedPiece;
+	chessBoard[pieceRow][pieceCol] = null;
 		
-		// actually moved piece in model
-		chessBoard[spaceRow][spaceCol] = movedPiece;
-		chessBoard[pieceRow][pieceCol] = null;
-		
-		// need to keep track of king moves for check testing
-		if (movedPiece.type == 'king')
-		{			
-			if (movedPiece.color == 'white')
+	// need to keep track of king moves for check testing
+	if (movedPiece.type == 'king')
+	{			
+		if (movedPiece.color == 'white')
+		{
+			// keep track for castling
+			if (whiteKingHasMoved == false)
 			{
-				// keep track for castling
-				if (whiteKingHasMoved == false)
+				var spaceDiff = pieceCol - spaceCol;
+				// check if castling
+				if (spaceDiff > 1)
 				{
-					var spaceDiff = pieceCol - spaceCol;
-					// check if castling
-					if (spaceDiff > 1)
-					{
-						// moving left, move rook right
-						chessBoard[0][2] = chessBoard[0][0];
-						chessBoard[0][0] = null;
-						$('.c1').append($('.a1 .piece'));
-						$('.a1').empty();
-						$('.c1 .piece').css('top', '0');
-						$('.c1 .piece').css('left', '0');
-						$('.c1 .piece').css('right', '0');
-					}
-					else if (spaceDiff < -1)
-					{
-						// moving right, move rook left
-						chessBoard[0][5] = chessBoard[0][7];
-						chessBoard[0][7] = null;
-						$('.f1').append($('.h1 .piece'));
-						$('.h1').empty();
-						$('.f1 .piece').css('top', '0');
-						$('.f1 .piece').css('left', '0');
-						$('.f1 .piece').css('right', '0');
-					}
-					whiteKingHasMoved = true;
+					// moving left, move rook right
+					chessBoard[0][2] = chessBoard[0][0];
+					chessBoard[0][0] = null;
+					$('.c1').append($('.a1 .piece'));
+					$('.a1').empty();
+					$('.c1 .piece').css('top', '0');
+					$('.c1 .piece').css('left', '0');
+					$('.c1 .piece').css('right', '0');
 				}
-				whiteKingPosition = [spaceRow, spaceCol];
+				else if (spaceDiff < -1)
+				{
+					// moving right, move rook left
+					chessBoard[0][5] = chessBoard[0][7];
+					chessBoard[0][7] = null;
+					$('.f1').append($('.h1 .piece'));
+					$('.h1').empty();
+					$('.f1 .piece').css('top', '0');
+					$('.f1 .piece').css('left', '0');
+					$('.f1 .piece').css('right', '0');
+				}
+				whiteKingHasMoved = true;
 			}
-			else
+			whiteKingPosition = [spaceRow, spaceCol];
+		}
+		else
+		{
+			if (blackKingHasMoved == false)
 			{
-				if (blackKingHasMoved == false)
+				var spaceDiff = pieceCol - spaceCol;
+				// check if castling
+				if (spaceDiff > 1)
 				{
-					var spaceDiff = pieceCol - spaceCol;
-					// check if castling
-					if (spaceDiff > 1)
-					{
-						// moving left, move rook right
-						chessBoard[7][2] = chessBoard[7][0];
-						chessBoard[7][0] = null;
-						$('.c8').append($('.a8 .piece'));
-						$('.a8').empty();
-						$('.c8 .piece').css('top', '0');
-						$('.c8 .piece').css('left', '0');
-						$('.c8 .piece').css('right', '0');
-					}
-					else if (spaceDiff < -1)
-					{
-						// moving right, move rook left
-						chessBoard[7][5] = chessBoard[7][7];
-						chessBoard[7][7] = null;
-						$('.f8').append($('.h8 .piece'));
-						$('.h8').empty();
-						$('.f8 .piece').css('top', '0');
-						$('.f8 .piece').css('left', '0');
-						$('.f8 .piece').css('right', '0');
-					}
-					blackKingHasMoved = true;
+					// moving left, move rook right
+					chessBoard[7][2] = chessBoard[7][0];
+					chessBoard[7][0] = null;
+					$('.c8').append($('.a8 .piece'));
+					$('.a8').empty();
+					$('.c8 .piece').css('top', '0');
+					$('.c8 .piece').css('left', '0');
+					$('.c8 .piece').css('right', '0');
 				}
-				blackKingPosition = [spaceRow, spaceCol];
+				else if (spaceDiff < -1)
+				{
+					// moving right, move rook left
+					chessBoard[7][5] = chessBoard[7][7];
+					chessBoard[7][7] = null;
+					$('.f8').append($('.h8 .piece'));
+					$('.h8').empty();
+					$('.f8 .piece').css('top', '0');
+					$('.f8 .piece').css('left', '0');
+					$('.f8 .piece').css('right', '0');
+				}
+				blackKingHasMoved = true;
 			}
+			blackKingPosition = [spaceRow, spaceCol];
+		}
+	}		
+	else if (movedPiece.type == 'pawn')
+	// check for pawn promotion	
+	{
+		var destRow;
+		var colorPrefix;
+		if (movedPiece.color == 'white')
+		{
+			destRow = 7;
+			colorPrefix = 'W';
+		}
+		else
+		{
+			destRow = 0;
+			colorPrefix = 'B';
+		}			
+		if (spaceRow == destRow)
+		{
+			$('.pawnSelect').show();
+			$('.pawnConfirm').live("click", function()
+			{
+				var pawnConfirmed = $('.pawnSelect select').val();
+				switch (pawnConfirmed)
+				{
+					case 'Queen':
+						piece.type = 'queen';
+						piece.value = 9;
+						movedDomPiece.html(colorPrefix + 'Q');
+						break;
+					case 'Rook':
+						piece.type = 'rook';
+						piece.value = 5;
+						movedDomPiece.html(colorPrefix + 'R');
+						break;
+					case 'Bishop':
+						piece.type = 'bishop';
+						piece.value = 3;
+						movedDomPiece.html(colorPrefix + 'B');
+						break;
+					case 'Knight':
+						piece.type = 'knight';
+						piece.value = 3;
+						movedDomPiece.html(colorPrefix + 'Kn');
+						break;
+				}	
+			});
+			$('.pawnSelect').hide();
+			$('.pawnSelect select').val('Queen');
 		}		
-		// empty, replace dom element
-		$(targetSpaceDom).empty();
-		$(targetSpaceDom).append(movedDomPiece);
+	}		
+	// empty, replace dom element
+	$(targetSpaceDom).empty();
+	$(targetSpaceDom).append(movedDomPiece);
 		
-		// reset css set by droppable since they don't expect node to be moved
-		$(movedDomPiece).css('top', '0');
-		$(movedDomPiece).css('left', '0');
-		$(movedDomPiece).css('right', '0');
+	// reset css set by droppable since they don't expect node to be moved
+	$(movedDomPiece).css('top', '0');
+	$(movedDomPiece).css('left', '0');
+	$(movedDomPiece).css('right', '0');
 		
-		pieceMoved = true;
+	pieceMoved = true;
 }
 
 function isMoveLegal(movedDomPiece, targetSpaceDom)
@@ -548,6 +606,7 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 	
 	if (piece.color == 'black')
 	{
+<<<<<<< Updated upstream
 		// straight down one space
 		if (isOccupied(board, (pieceRow-1), pieceCol) == 'empty')
 		{
@@ -563,9 +622,19 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 			pawnMoves.push([pieceRow-1, pieceCol-1]);
 		if (isOccupied(board, (pieceRow-1), pieceCol+1) == 'white')
 			pawnMoves.push([pieceRow-1, pieceCol+1]);
+=======
+		dir = -1; // going down
+		fRow = 6;
+	}
+	else
+	{
+		dir = 1; // up
+		fRow = 1;
+>>>>>>> Stashed changes
 	}
 	else if (piece.color == 'white')
 	{
+<<<<<<< Updated upstream
 		// straight down one space
 		if (isOccupied(board, (pieceRow+1), pieceCol) == 'empty')
 		{
@@ -579,6 +648,22 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 		if (isOccupied(board, (pieceRow+1), pieceCol+1) == 'black')
 			pawnMoves.push([pieceRow+1, pieceCol+1]);
 	}
+=======
+		pawnMoves.push([pieceRow + dir, pieceCol]);
+		
+		// if first space is empty, check if first move, if so, add two-space move
+		if (pieceRow == fRow)
+		{
+			if (isOccupied(board, (pieceRow + (dir * 2)), pieceCol) == 'empty')
+				pawnMoves.push([pieceRow + (dir * 2), pieceCol]);
+		}
+	}
+	// or capturing diagonal spaces
+	if (isOccupied(board, (pieceRow + dir), pieceCol - 1) == getOppositeColor(piece.color))
+		pawnMoves.push([pieceRow + dir, pieceCol - 1]);
+	if (isOccupied(board, (pieceRow + dir), pieceCol + 1) == getOppositeColor(piece.color))
+		pawnMoves.push([pieceRow + dir, pieceCol + 1]);
+>>>>>>> Stashed changes
 	return pawnMoves;
 }
 
