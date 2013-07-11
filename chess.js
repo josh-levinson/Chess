@@ -33,7 +33,68 @@ $(document).ready(function(){
 			}
    });
    
-   
+   $('.pawnConfirm').click(function(){				
+			
+			// need to find the pawn which set us off
+			var pawnCoordinates;
+			var localPiece; // temp to hold current piece
+			for (var l=0; l<8; l++)
+			{
+				if ((isOccupied(chessBoard, 0, l)) != 'empty')
+				{
+					localPiece = chessBoard[0][l];
+					if (localPiece.type == 'pawn')
+					{
+						pawnCoordinates = [0, l];
+					}
+				}
+				if ((isOccupied(chessBoard, 7, l)) != 'empty')
+				{
+					localPiece = chessBoard[7][l];
+					if (localPiece.type == 'pawn')
+					{
+						pawnCoordinates = [7, l];
+					}
+				}
+			}
+			if (pawnCoordinates != 'undefined')
+			{
+				var movedPawn = chessBoard[pawnCoordinates[0]][pawnCoordinates[1]];
+				var movedPawnDomSpace = convertSpaceModelToDom([pawnCoordinates]);
+				var movedPawnDom = $(movedPawnDomSpace + ' .piece');
+				var colorPrefix = movedPawn.color.charAt(0).toUpperCase();
+				var pawnConfirmed = $('.pawnSelect select').val();
+				switch (pawnConfirmed)
+				{
+					case 'Queen':
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].type = 'queen';
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].value = 9;
+						$(movedPawnDom).html(colorPrefix + 'Q');
+						$(movedPawnDom).removeClass('pawn').addClass('queen');
+						break;
+					case 'Rook':
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].type = 'rook';
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].value = 5;
+						$(movedPawnDom).html(colorPrefix + 'R');
+						$(movedPawnDom).removeClass('pawn').addClass('rook');
+						break;
+					case 'Bishop':
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].type = 'bishop';
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].value = 3;
+						$(movedPawnDom).html(colorPrefix + 'B');
+						$(movedPawnDom).removeClass('pawn').addClass('bishop');
+						break;
+					case 'Knight':
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].type = 'knight';
+						chessBoard[pawnCoordinates[0]][pawnCoordinates[1]].value = 3;
+						$(movedPawnDom).html(colorPrefix + 'Kn');
+						$(movedPawnDom).removeClass('pawn').addClass('knight');
+						break;
+				}	
+			}
+		$('.pawnSelect').hide();
+		$('.pawnSelect select').val('Queen');
+		});   
 });
    
 
@@ -137,8 +198,8 @@ function isOnBoard(row, column)
 
 function convertSpaceModelToDom(spaces)
 {
-	/* takes array of spaces and returns string that represents
-	 * multiple selectors which can be used by jQuery
+	/* takes an array of chess pieces and returns a string that represents
+	 * a group of selectors which can be used by jQuery
 	 */
 	var domSelectors = [];
 	
@@ -306,35 +367,6 @@ function performMove(movedDomPiece, targetSpaceDom)
 		if (spaceRow == destRow)
 		{
 			$('.pawnSelect').show();
-			$('.pawnConfirm').live("click", function()
-			{
-				var pawnConfirmed = $('.pawnSelect select').val();
-				switch (pawnConfirmed)
-				{
-					case 'Queen':
-						piece.type = 'queen';
-						piece.value = 9;
-						movedDomPiece.html(colorPrefix + 'Q');
-						break;
-					case 'Rook':
-						piece.type = 'rook';
-						piece.value = 5;
-						movedDomPiece.html(colorPrefix + 'R');
-						break;
-					case 'Bishop':
-						piece.type = 'bishop';
-						piece.value = 3;
-						movedDomPiece.html(colorPrefix + 'B');
-						break;
-					case 'Knight':
-						piece.type = 'knight';
-						piece.value = 3;
-						movedDomPiece.html(colorPrefix + 'Kn');
-						break;
-				}	
-			});
-			$('.pawnSelect').hide();
-			$('.pawnSelect select').val('Queen');
 		}		
 	}		
 	// empty, replace dom element
@@ -616,18 +648,20 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 	}
 	pawnMoves.push([pieceRow + dir, pieceCol]);
 	
-	// if first space is empty, check if first move, if so, add two-space move
-	if (pieceRow == fRow)
+	if (pieceRow > 0 && pieceRow < 8)
 	{
-		if (isOccupied(board, (pieceRow + (dir * 2)), pieceCol) == 'empty')
-			pawnMoves.push([pieceRow + (dir * 2), pieceCol]);
+		// if first space is empty, check if first move, if so, add two-space move
+		if (pieceRow == fRow)
+		{
+			if (isOccupied(board, (pieceRow + (dir * 2)), pieceCol) == 'empty')
+				pawnMoves.push([pieceRow + (dir * 2), pieceCol]);
+		}
+		// or capturing diagonal spaces
+		if (isOccupied(board, (pieceRow + dir), pieceCol - 1) == getOppositeColor(piece.color))
+			pawnMoves.push([pieceRow + dir, pieceCol - 1]);
+		if (isOccupied(board, (pieceRow + dir), pieceCol + 1) == getOppositeColor(piece.color))
+			pawnMoves.push([pieceRow + dir, pieceCol + 1]);
 	}
-	// or capturing diagonal spaces
-	if (isOccupied(board, (pieceRow + dir), pieceCol - 1) == getOppositeColor(piece.color))
-		pawnMoves.push([pieceRow + dir, pieceCol - 1]);
-	if (isOccupied(board, (pieceRow + dir), pieceCol + 1) == getOppositeColor(piece.color))
-		pawnMoves.push([pieceRow + dir, pieceCol + 1]);
-		
 	return pawnMoves;
 }
 
