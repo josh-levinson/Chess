@@ -684,7 +684,7 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 	}
 	pawnMoves.push([pieceRow + dir, pieceCol]);
 	
-	if (pieceRow > 0 && pieceRow < 8)
+	if (pieceRow > 0 && pieceRow < 7)
 	{
 		// if first space is empty, check if first move, if so, add two-space move
 		if (pieceRow == fRow)
