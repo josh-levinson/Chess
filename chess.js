@@ -257,7 +257,7 @@ function switchTurn()
 		if (checkMateResult == "stalemate")
 			alert("Stalemate!");
 		else
-			alert("Checkmate: " + lastMove + " wins!")
+			alert("Checkmate: " + lastMove + " wins!");
 	}
 }
 
@@ -268,6 +268,9 @@ function performMove(movedDomPiece, targetSpaceDom)
 	if (typeof movedDomPiece == 'undefined')
 		return false;
 		
+	// remove possibility of last En Passant
+	$('.enPassant').removeClass('.enPassant');
+	
 	// get piece from location of dropped piece
 	var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
 	var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
@@ -276,6 +279,8 @@ function performMove(movedDomPiece, targetSpaceDom)
 	var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
 	var spaceCol = parseInt(targetSpaceDom[0].classList[4].substr(3, 1));
 		
+	var destSpaceOccupied = isOccupied(chessBoard, spaceRow, spaceCol);
+	
 	// actually moved piece in model
 	chessBoard[spaceRow][spaceCol] = movedPiece;
 	chessBoard[pieceRow][pieceCol] = null;
@@ -350,8 +355,15 @@ function performMove(movedDomPiece, targetSpaceDom)
 		}
 	}		
 	else if (movedPiece.type == 'pawn')
-	// check for pawn promotion	
-	{
+	// check for pawn promotion/en passant
+	{	
+		// set flag for En Passant (for next turn)
+		var spacesMoved = Math.abs(spaceRow - pieceRow);
+		
+		if (spacesMoved == 2)
+			$(movedDomPiece).addClass('enPassant');
+			
+		// check if last row for pawn promotion
 		var destRow;
 		var colorPrefix;
 		if (movedPiece.color == 'white')
@@ -367,6 +379,30 @@ function performMove(movedDomPiece, targetSpaceDom)
 		if (spaceRow == destRow)
 		{
 			$('.pawnSelect').show();
+		}
+		
+		// check for En Passant
+		if (spaceCol != pieceCol)
+		{
+			/* moved diagonally for capture, must verify two conditions for En Passant:
+			a) destination space is empty, b) row "behind" piece has pawn */
+			
+			if (destSpaceOccupied == 'empty')
+			{
+				if (movedPiece.color == 'white')
+				{
+					takenSpace = $(convertSpaceModelToDom([[spaceRow - 1, spaceCol]]));
+					takenSpace.empty();
+					chessBoard[spaceRow - 1][spaceCol] == null;
+				}
+				else
+				{
+					takenSpace = $(convertSpaceModelToDom([[spaceRow + 1, spaceCol]]));
+					takenSpace.empty();
+					chessBoard[spaceRow + 1][spaceCol] == null;
+				}
+			}
+			
 		}		
 	}		
 	// empty, replace dom element
@@ -661,7 +697,21 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 			pawnMoves.push([pieceRow + dir, pieceCol - 1]);
 		if (isOccupied(board, (pieceRow + dir), pieceCol + 1) == getOppositeColor(piece.color))
 			pawnMoves.push([pieceRow + dir, pieceCol + 1]);
+		// or En Passant moves
+		if (isOccupied(board, pieceRow, (pieceCol + 1)) == getOppositeColor(piece.color))
+		{
+			var adjPawn = $(convertSpaceModelToDom([[pieceRow, pieceCol + 1]])).children();
+			if (adjPawn.hasClass('enPassant'))
+				pawnMoves.push([pieceRow + dir, pieceCol + 1]);
+		}
+		if (isOccupied(board, pieceRow, (pieceCol - 1)) == getOppositeColor(piece.color))
+		{
+			var adjPawn = $(convertSpaceModelToDom([[pieceRow, pieceCol - 1]])).children();
+			if (adjPawn.hasClass('enPassant'))
+				pawnMoves.push([pieceRow + dir, pieceCol - 1]);
+		}			
 	}
+	
 	return pawnMoves;
 }
 
