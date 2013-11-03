@@ -15,4 +15,5 @@ Current progress:
 2. Moves are generally legal
 3. Checkmate can be achieved
 4. Castling/Pawn Promotion have now been implemented
-5. Outlier moves still to be performed
+5. Finished En Passant and fixed checkmate bugs.
+6. More testing to follow. 
