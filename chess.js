@@ -773,9 +773,11 @@ function performCheckTest(testBoard)
 				for (z = 0; z < currentPieceMoves.length; z++)
 				{
 					if (currentPiece.color == "black" && (futureWhiteKingPosition[0] == currentPieceMoves[z][0]) && (futureWhiteKingPosition[1] == currentPieceMoves[z][1]))
-						whiteKingChecked = true;
+						if (currentPiece.type != "pawn" || y != futureWhiteKingPosition[1])	
+							whiteKingChecked = true;
 					if (currentPiece.color == "white" && (futureBlackKingPosition[0] == currentPieceMoves[z][0]) && (futureBlackKingPosition[1] == currentPieceMoves[z][1]))
-						blackKingChecked = true;
+						if (currentPiece.type != "pawn" || y != futureBlackKingPosition[1])
+							blackKingChecked = true;
 				}
 			}
 		}

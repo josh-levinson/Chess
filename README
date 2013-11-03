@@ -17,6 +17,4 @@ Current progress:
 4. Castling/Pawn Promotion have now been implemented
 5. Finished En Passant and fixed checkmate bugs.
 6. More testing to follow.
-
-Current Bugs:
-1. King cannot move space above/below pawn because it believes its putting itself in check (byproduct of using "next move" as check condition) 
+7. Fixed bug preventing King from moving into space directly above/below pawn (false check flag) 
