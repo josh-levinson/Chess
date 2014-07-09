@@ -798,25 +798,37 @@ function testCheckmate()
 	var someoneCanMove = false;
 	var currentPiece = null;
 	var currentLegalMoves = null;
+	var stillChecked = true;
+	var checkStatus;
 	
 	for (a=0; a < 8; a++)
 	{
 		for (b = 0; b < 8; b++)
 		{
 			currentPiece = chessBoard[a][b];
-			if (currentPiece != null || currentPiece != undefined)
+			if (currentPiece != null && currentPiece != undefined)
 			{
 				currentLegalMoves = determineLegalMoves(chessBoard, currentPiece, a, b);
 				if (currentLegalMoves.length > 0)
 				{
 					if (currentPiece.color == currentMove)
+					{
 						someoneCanMove = true;
+						var futureBoard = chessBoard;
+						for (c = 0; c < currentLegalMoves.length; c++)
+						{
+							futureBoard[currentLegalMoves[c][0]][currentLegalMoves[c][1]] = currentPiece;
+							futureBoard[a][b] = null;
+							checkStatus = performCheckTest(chessBoard);
+							if (performCheckTest(futureBoard) != checkStatus)
+								stillChecked = false;
+						}
+					}
 				}
 			}
 		}
 	}
-	var checkStatus = performCheckTest(chessBoard);
-	if ((checkStatus == "both" || checkStatus == currentMove) && someoneCanMove == true)
+	if ((checkStatus == "both" || checkStatus == currentMove) && someoneCanMove == false && stillChecked)
 		return "checkmate";
 	else if (someoneCanMove == false)
 		return "stalemate";
