@@ -814,7 +814,7 @@ function testCheckmate()
 					if (currentPiece.color == currentMove)
 					{
 						someoneCanMove = true;
-						var futureBoard = chessBoard;
+						var futureBoard = cloneObject(chessBoard);
 						for (c = 0; c < currentLegalMoves.length; c++)
 						{
 							futureBoard[currentLegalMoves[c][0]][currentLegalMoves[c][1]] = currentPiece;
