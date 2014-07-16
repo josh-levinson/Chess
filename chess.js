@@ -227,6 +227,16 @@ function convertSpaceDomToModel(selector)
 	return locations;	
 }
 
+function getSpaceFromPiece(piece)
+{
+  // take piece, return row/col pair
+  var returnSpace = [];
+  returnSpace[0] = parseInt(piece.parent()[0].classList[3].substr(3, 1));
+  returnSpace[1] = parseInt(piece.parent()[0].classList[4].substr(3, 1));
+
+  return returnSpace;
+}
+
 function getOppositeColor(color)
 {
 	if (color == "white")
@@ -272,8 +282,11 @@ function performMove(movedDomPiece, targetSpaceDom)
 	$('.enPassant').removeClass('.enPassant');
 	
 	// get piece from location of dropped piece
-	var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
-	var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
+        var pieceSpace = getSpaceFromPiece(movedDomPiece);
+        
+	var pieceRow = pieceSpace[0]; 
+	var pieceCol = pieceSpace[1];
+
 	var movedPiece = chessBoard[pieceRow][pieceCol];
 	
 	var spaceRow = parseInt(targetSpaceDom[0].classList[3].substr(3, 1));
@@ -420,8 +433,9 @@ function performMove(movedDomPiece, targetSpaceDom)
 function isMoveLegal(movedDomPiece, targetSpaceDom)
 {
 		// get piece from location of dropped piece
-		var pieceRow = parseInt(movedDomPiece.parent()[0].classList[3].substr(3, 1));
-		var pieceCol = parseInt(movedDomPiece.parent()[0].classList[4].substr(3, 1));
+                var pieceSpace = getSpaceFromPiece(movedDomPiece); 
+		var pieceRow = pieceSpace[0]; 
+		var pieceCol = pieceSpace[1]; 
 		
 		var movedPiece = chessBoard[pieceRow][pieceCol];
 		if (movedPiece == null)
