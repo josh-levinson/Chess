@@ -487,33 +487,35 @@ function determineLegalMoves(board, pieceRow, pieceCol)
 		switch (piece.type)
 		{
 			case 'pawn':
-				legalMoves = addPawnMoves(board, piece, pieceRow, pieceCol);			
+				legalMoves = addPawnMoves(board, pieceRow, pieceCol);			
 				break;
 			case 'bishop':
-				legalMoves = addDiagonalMoves(board, piece, pieceRow, pieceCol);
+				legalMoves = addDiagonalMoves(board, pieceRow, pieceCol);
 				break;
 			case 'knight':
-				legalMoves = addKnightMoves(board, piece, pieceRow, pieceCol);
+				legalMoves = addKnightMoves(board, pieceRow, pieceCol);
 				break;
 			case 'rook':
-				legalMoves = addStraightLineMoves(board, piece, pieceRow, pieceCol);
+				legalMoves = addStraightLineMoves(board, pieceRow, pieceCol);
 				break;			
 			case 'queen':
-				legalMoves = addDiagonalMoves(board, piece, pieceRow, pieceCol).concat(addStraightLineMoves(board, piece, pieceRow, pieceCol));
+				legalMoves = addDiagonalMoves(board, pieceRow, pieceCol).concat(addStraightLineMoves(board, pieceRow, pieceCol));
 				break;
 			case 'king':
-				legalMoves = addKingMoves(board, piece, pieceRow, pieceCol).concat(addKingCastleMoves(board, piece, pieceRow, pieceCol));
+				legalMoves = addKingMoves(board, pieceRow, pieceCol).concat(addKingCastleMoves(board, pieceRow, pieceCol));
 				break;
 		}
 	}
 	return legalMoves;	
 }
 
-function addStraightLineMoves(board, piece, pieceRow, pieceCol)
+function addStraightLineMoves(board, pieceRow, pieceCol)
 {
 	var straightMoves = []; // holds return moves
 	
-	// start by going up in rows
+	var piece = board[pieceRow][pieceCol];
+        
+        // start by going up in rows
 	for (i=pieceRow+1; i<8; i++)
 	{
 		var nextSpace = [i, pieceCol];
@@ -576,11 +578,13 @@ function addStraightLineMoves(board, piece, pieceRow, pieceCol)
 	return straightMoves;
 }
 
-function addDiagonalMoves(board, piece, pieceRow, pieceCol)
+function addDiagonalMoves(board, pieceRow, pieceCol)
 {
 	var diagonalMoves = [];
 	
-	// first determine moves going up both rows and cols
+	var piece = board[pieceRow][pieceCol];
+        
+        // first determine moves going up both rows and cols
 	var j = pieceCol + 1; // need to keep track of column as well
 	for (i=pieceRow+1; (i < 8 && j < 8); i++)
 	{
@@ -651,12 +655,14 @@ function addDiagonalMoves(board, piece, pieceRow, pieceCol)
 	return diagonalMoves;
 }
 
-function addKnightMoves(board, piece, pieceRow, pieceCol)
+function addKnightMoves(board, pieceRow, pieceCol)
 {
 	var knightMoves = [];
 	// have to manually check moves here unless I figure out a shortcut later
 	
-	var nextSpace = [pieceRow+2, pieceCol+1];
+	var piece = board[pieceRow][pieceCol];
+        
+        var nextSpace = [pieceRow+2, pieceCol+1];
 	if ((isOnBoard(nextSpace[0], nextSpace[1])) && (isOccupied(board, nextSpace[0], nextSpace[1]) != piece.color))
 		knightMoves.push(nextSpace);
 	nextSpace = [pieceRow+2, pieceCol-1];
@@ -684,11 +690,13 @@ function addKnightMoves(board, piece, pieceRow, pieceCol)
 	return knightMoves;
 }
 
-function addPawnMoves(board, piece, pieceRow, pieceCol)
+function addPawnMoves(board, pieceRow, pieceCol)
 {
 	pawnMoves = [];
 	
-	if (piece.color == 'black')
+	var piece = board[pieceRow][pieceCol];
+        
+        if (piece.color == 'black')
 	{
 		dir = -1; // going down
 		fRow = 6;
@@ -731,11 +739,13 @@ function addPawnMoves(board, piece, pieceRow, pieceCol)
 	return pawnMoves;
 }
 
-function addKingMoves(board, piece, pieceRow, pieceCol)
+function addKingMoves(board, pieceRow, pieceCol)
 {
 	kingMoves = [];
 	
-	// have to manually go through them as far as I know
+	var piece = board[pieceRow][pieceCol];
+        
+        // have to manually go through them as far as I know
 	for (i = -1; i < 2; i++)
 	{
 		for (j = -1; j < 2; j++)
@@ -747,9 +757,11 @@ function addKingMoves(board, piece, pieceRow, pieceCol)
 	return kingMoves;
 }
 
-function addKingCastleMoves(board, piece, pieceRow, pieceCol)
+function addKingCastleMoves(board, pieceRow, pieceCol)
 {
-	castleMoves = [];
+      var piece = board[pieceRow][pieceCol];	
+  
+      castleMoves = [];
 	if (currentMove == "white" && piece.color == "white")
 	{
 		if (!whiteKingHasMoved)
