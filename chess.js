@@ -454,7 +454,7 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		
 		
 		var targetSpace = [spaceRow, spaceCol];
-		var legalMoves = determineLegalMoves(chessBoard, movedPiece, pieceRow, pieceCol);
+		var legalMoves = determineLegalMoves(chessBoard, pieceRow, pieceCol);
 		
 		for (i=0; i<legalMoves.length; i++)
 		{
@@ -476,11 +476,13 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		return false;
 }
 
-function determineLegalMoves(board, piece, pieceRow, pieceCol)
+function determineLegalMoves(board, pieceRow, pieceCol)
 {
 	var legalMoves = []; // holds the return moves, a string of row, col pairs
 	
-	if (piece != null)
+	var piece = board[pieceRow][pieceCol];
+        
+        if (piece != null)
 	{
 		switch (piece.type)
 		{
@@ -783,7 +785,7 @@ function performCheckTest(testBoard)
 			if (typeof(testBoard[x][y]) == "object")
 			{
 				var currentPiece = testBoard[x][y];
-				var currentPieceMoves = determineLegalMoves(testBoard, currentPiece, x, y);
+				var currentPieceMoves = determineLegalMoves(testBoard, x, y);
 				for (z = 0; z < currentPieceMoves.length; z++)
 				{
 					if (currentPiece.color == "black" && (futureWhiteKingPosition[0] == currentPieceMoves[z][0]) && (futureWhiteKingPosition[1] == currentPieceMoves[z][1]))
@@ -822,7 +824,7 @@ function testCheckmate()
 			currentPiece = chessBoard[a][b];
 			if (currentPiece != null && currentPiece != undefined)
 			{
-				currentLegalMoves = determineLegalMoves(chessBoard, currentPiece, a, b);
+				currentLegalMoves = determineLegalMoves(chessBoard, a, b);
 				if (currentLegalMoves.length > 0)
 				{
 					if (currentPiece.color == currentMove)
