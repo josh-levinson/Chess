@@ -751,7 +751,7 @@ function addKingMoves(board, pieceRow, pieceCol)
 		for (j = -1; j < 2; j++)
 		{
 			if (isOnBoard(pieceRow + i, pieceCol + j) && isOccupied(board, pieceRow + i, pieceCol + j) != piece.color)
-				kingMoves.push([pieceRow + i, pieceCol + j]);
+                            kingMoves.push([pieceRow + i, pieceCol + j]);
 		}
 	}
 	return kingMoves;
@@ -841,14 +841,20 @@ function testCheckmate()
 				{
 					if (currentPiece.color == currentMove)
 					{
-						someoneCanMove = true;
+                                                if (currentPiece.type != "king")	
+                                                 someoneCanMove = true;
 						var futureBoard = cloneObject(chessBoard);
 						for (c = 0; c < currentLegalMoves.length; c++)
 						{
-							futureBoard[currentLegalMoves[c][0]][currentLegalMoves[c][1]] = currentPiece;
-							futureBoard[a][b] = null;
-							checkStatus = performCheckTest(chessBoard);
-							if (performCheckTest(futureBoard) != checkStatus)
+                                                        if (currentPiece.type == "king" && currentPiece.color == "black")
+                                                          futureBlackKingPosition = [currentLegalMoves[c][0], currentLegalMoves[c][1]];
+                                                        else if (currentPiece.type == "king" && currentPiece.color == "white")
+                                                          futureWhiteKingPosition = [currentLegalMoves[c][0], currentLegalMoves[c][1]];
+                                                        
+                                                        futureBoard[currentLegalMoves[c][0]][currentLegalMoves[c][1]] = currentPiece;
+						        futureBoard[a][b] = null;
+						        checkStatus = performCheckTest(chessBoard);
+						        if (performCheckTest(futureBoard) != checkStatus)
 								stillChecked = false;
 						}
 					}
@@ -856,7 +862,7 @@ function testCheckmate()
 			}
 		}
 	}
-	if ((checkStatus == "both" || checkStatus == currentMove) && someoneCanMove == false && stillChecked)
+	if ((checkStatus == "both" || checkStatus == currentMove) && someoneCanMove == true && stillChecked)
 		return "checkmate";
 	else if (someoneCanMove == false)
 		return "stalemate";
