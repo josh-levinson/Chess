@@ -4,14 +4,7 @@ var chessBoard = InitBoard();
 var whiteKingHasMoved = false; // need for castling
 var blackKingHasMoved = false; 
 
-var whiteKingPosition = [0, 4]; //shortcut to prevent searching entire board for king
-var blackKingPosition = [7, 4];
-
 varKingIsCastling = false;
-
-// for check testing
-var futureWhiteKingPosition = whiteKingPosition;
-var futureBlackKingPosition = blackKingPosition;
 
 var currentMove = 'white';
 
@@ -174,7 +167,10 @@ function InitBoard()
 	newBoard[0][4] = king['white'];
 	newBoard[7][4] = king['black'];
 
-	return newBoard;
+	newBoard.whiteKingPos = [0, 4];
+        newBoard.blackKingPos = [7, 4];
+        
+        return newBoard;
 }
 
 function isOccupied(board, row, column)
@@ -332,7 +328,7 @@ function performMove(movedDomPiece, targetSpaceDom)
 				}
 				whiteKingHasMoved = true;
 			}
-			whiteKingPosition = [spaceRow, spaceCol];
+			chessBoard.whiteKingPos = [spaceRow, spaceCol];
 		}
 		else
 		{
@@ -447,9 +443,9 @@ function isMoveLegal(movedDomPiece, targetSpaceDom)
 		if (movedPiece.type == 'king')
 		{
 			if (movedPiece.color == 'white')
-				futureWhiteKingPosition = [spaceRow, spaceCol];
+				chessBoard.whiteKingPos = [spaceRow, spaceCol];
 			else
-				futureBlackKingPosition = [spaceRow, spaceCol];
+				chessBoard.blackKingPos = [spaceRow, spaceCol];
 		}
 		
 		
@@ -800,11 +796,11 @@ function performCheckTest(testBoard)
 				var currentPieceMoves = determineLegalMoves(testBoard, x, y);
 				for (z = 0; z < currentPieceMoves.length; z++)
 				{
-					if (currentPiece.color == "black" && (futureWhiteKingPosition[0] == currentPieceMoves[z][0]) && (futureWhiteKingPosition[1] == currentPieceMoves[z][1]))
-						if (currentPiece.type != "pawn" || y != futureWhiteKingPosition[1])	
+					if (currentPiece.color == "black" && (testBoard.whiteKingPos[0] == currentPieceMoves[z][0]) && (testBoard.whiteKingPos[1] == currentPieceMoves[z][1]))
+						if (currentPiece.type != "pawn" || y != testBoard.whiteKingPos[1])	
 							whiteKingChecked = true;
-					if (currentPiece.color == "white" && (futureBlackKingPosition[0] == currentPieceMoves[z][0]) && (futureBlackKingPosition[1] == currentPieceMoves[z][1]))
-						if (currentPiece.type != "pawn" || y != futureBlackKingPosition[1])
+					if (currentPiece.color == "white" && (testBoard.blackKingPos[0] == currentPieceMoves[z][0]) && (testBoard.blackKingPos[1] == currentPieceMoves[z][1]))
+						if (currentPiece.type != "pawn" || y != testBoard.blackKingPos[1])
 							blackKingChecked = true;
 				}
 			}
@@ -847,13 +843,14 @@ function testCheckmate()
 						for (c = 0; c < currentLegalMoves.length; c++)
 						{
                                                         if (currentPiece.type == "king" && currentPiece.color == "black")
-                                                          futureBlackKingPosition = [currentLegalMoves[c][0], currentLegalMoves[c][1]];
+                                                          futureBoard.blackKingPos = [currentLegalMoves[c][0], currentLegalMoves[c][1]];
                                                         else if (currentPiece.type == "king" && currentPiece.color == "white")
-                                                          futureWhiteKingPosition = [currentLegalMoves[c][0], currentLegalMoves[c][1]];
+                                                          futureBoard.whiteKingPos = [currentLegalMoves[c][0], currentLegalMoves[c][1]];
                                                         
                                                         futureBoard[currentLegalMoves[c][0]][currentLegalMoves[c][1]] = currentPiece;
 						        futureBoard[a][b] = null;
-						        checkStatus = performCheckTest(chessBoard);
+						        
+                                                        checkStatus = performCheckTest(chessBoard);
 						        if (performCheckTest(futureBoard) != checkStatus)
 								stillChecked = false;
 						}
