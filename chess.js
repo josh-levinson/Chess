@@ -275,7 +275,7 @@ function performMove(movedDomPiece, targetSpaceDom)
 		return false;
 		
 	// remove possibility of last En Passant
-	$('.enPassant').removeClass('.enPassant');
+	$('.enPassant').removeClass('enPassant');
 	
 	// get piece from location of dropped piece
         var pieceSpace = getSpaceFromPiece(movedDomPiece);
