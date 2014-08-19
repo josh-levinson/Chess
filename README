@@ -18,8 +18,8 @@ Current progress:
 5. Finished En Passant and fixed checkmate bugs.
 6. More testing to follow.
 7. Fixed bug preventing King from moving into space directly above/below pawn (false check flag)
-8. Added king position as board property in order to easily test future boards
+8. Fixed checkmate bug.
 
-Current bugs:
-1. Pawns can attack above/below.
-2. Checkmate is probably broken, needs more testing. 
+Current (known) bugs:
+1. Sometimes thinks King is in check when it is not -- Caused by "FutureKingPosition" variables not being reset after checkmate test
+  -Should checktest pass king position variables? Or should checkmate test set king positions back to origin?
