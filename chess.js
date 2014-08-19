@@ -702,7 +702,10 @@ function addPawnMoves(board, pieceRow, pieceCol)
 		dir = 1; // up
 		fRow = 1;
 	}
-	pawnMoves.push([pieceRow + dir, pieceCol]);
+	
+        // can go up/down if space is unoccupied
+        if (isOccupied(board, (pieceRow + dir), pieceCol) == 'empty')
+          pawnMoves.push([pieceRow + dir, pieceCol]);
 	
 	if (pieceRow > 0 && pieceRow < 7)
 	{
