@@ -19,7 +19,7 @@ Current progress:
 6. More testing to follow.
 7. Fixed bug preventing King from moving into space directly above/below pawn (false check flag)
 8. Fixed checkmate bug.
+9. Fixed pawns moving up bug. (Very stupid.)
 
 Current (known) bugs:
-1. Sometimes thinks King is in check when it is not -- Caused by "FutureKingPosition" variables not being reset after checkmate test
-  -Should checktest pass king position variables? Or should checkmate test set king positions back to origin?
+1. Pieces can move even if they are blocking check
